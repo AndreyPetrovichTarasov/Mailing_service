@@ -2,6 +2,7 @@ from django.db import models
 
 
 class Message(models.Model):
+    objects: models.Manager = models.Manager()
     subject = models.CharField(max_length=255)
     body = models.TextField()
 

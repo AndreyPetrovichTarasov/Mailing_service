@@ -39,7 +39,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'config' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -104,4 +104,4 @@ EMAIL_PORT = 465  # Для SSL
 EMAIL_USE_SSL = True
 EMAIL_HOST_USER = os.getenv('MY_EMAIL')  # Ваш email на Rambler
 EMAIL_HOST_PASSWORD = os.getenv('MY_EMAIL_PASSWORD')  # Ваш пароль
-DEFAULT_FROM_EMAIL = os.getenv('MY_EMAIL')
+DEFAULT_FROM_EMAIL = os.getenv('MY_EMAIL')  # Ваш email на Rambler

@@ -5,6 +5,7 @@ from messages_list.models import Message
 
 
 class Mailing(models.Model):
+    objects: models.Manager = models.Manager()
     STATUS_CHOICES = [
         ('Создана', 'Создана'),
         ('Запущена', 'Запущена'),
@@ -22,6 +23,7 @@ class Mailing(models.Model):
 
 
 class MailingAttempt(models.Model):
+    objects: models.Manager = models.Manager()
     STATUS_CHOICES = [
         ('Успешно', 'Успешно'),
         ('Не успешно', 'Не успешно'),
