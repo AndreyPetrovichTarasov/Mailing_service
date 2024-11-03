@@ -2,14 +2,15 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import HomePageView
+from .views import HomePageView, ContactsView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', HomePageView.as_view(), name='home'),
+    path('contacts.html', ContactsView.as_view(), name='contacts'),
     path('clients/', include('clients.urls', namespace='clients')),
     path('mailings/', include('mailings.urls', namespace='mailings')),
-    path('messages_list/', include('messages_list.urls', namespace='messages_list')),
+    path('messages_list/', include('messages_list.urls', namespace='messages')),
 ]
 
 # Обработка медиафайлов в режиме DEBUG
