@@ -8,4 +8,4 @@ class Client(models.Model):
     comment = models.TextField()
 
     def __str__(self):
-        return self.email
+        return f'{self.full_name}: {self.email}'
