@@ -8,7 +8,10 @@
                 <div class="card shadow-sm w-100">
 <!--                    <img src="{{ clients.preview_image | media_filter }}" class="img-fluid" style="height: 400px; object-fit: cover; width: 100%;">-->
                     <div class="card-body">
+                        {% if mailing.status == 'Создана' %}
                         <a class="btn btn-danger" href="{% url 'mailings:mailing_confirm_send' mailing.id %}" role="button">Запустить рассылку</a>
+                        {% endif %}
+                        <a class="btn btn-primary" href="{% url 'mailings:mailing_status'  mailing.pk%}" role="button">Статистика</a>
                         <h1 class="card-title text-center">{{ mailing.message }}</h1>
                         <p class="card-text">Начало: {{ mailing.start_time }}</p>
                         <p class="card-text">Окончание: {{ mailing.end_time }}</p>

@@ -30,6 +30,7 @@ class MailingAttempt(models.Model):
     ]
 
     mailing = models.ForeignKey(Mailing, on_delete=models.CASCADE)
+    recipient = models.ForeignKey(Client, on_delete=models.CASCADE)
     attempt_time = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES)
     response = models.TextField()

@@ -21,6 +21,7 @@ def send_mailing(mailing):
         # Создаем запись попытки отправки
         MailingAttempt.objects.create(
             mailing=mailing,
+            recipient=recipient,
             status=status,
             response=response
         )

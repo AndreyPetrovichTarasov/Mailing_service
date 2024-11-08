@@ -1,5 +1,6 @@
 {% extends 'base_templates/base.html' %}
 {% block content %}
+<a href="{% url 'mailings:mailing_list' %}" class="btn btn-primary">Назад к списку рассылок</a>
 <h2>Статус рассылки #{{ mailing.id }}</h2>
 <p>Статус: {{ mailing.status }}</p>
 <h3>Попытки отправки:</h3>
