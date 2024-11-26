@@ -34,13 +34,23 @@ class MailingForm(forms.ModelForm):
     class Meta:
         model = Mailing
         fields = ['start_time', 'end_time', 'status', 'message', 'recipients']
+
         widgets = {
             'start_time': forms.DateTimeInput(
                 attrs={'type': 'datetime-local', 'class': 'form-control', 'placeholder': 'Начало'}),
             'end_time': forms.DateTimeInput(
                 attrs={'type': 'datetime-local', 'class': 'form-control', 'placeholder': 'Окончание'}),
             'status': forms.Select(attrs={'class': 'form-control'}),
-            # Поменяем на Select для выбора из доступных статусов
             'message': forms.Select(attrs={'class': 'form-control'}),
             'recipients': forms.SelectMultiple(attrs={'class': 'form-control'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)  # Получаем пользователя из kwargs
+        super().__init__(*args, **kwargs)
+
+        if user:
+            # Фильтруем сообщения по владельцу (текущему пользователю)
+            self.fields['message'].queryset = Message.objects.filter(owner=user)
+            # Фильтруем клиентов по владельцу (текущему пользователю)
+            self.fields['recipients'].queryset = Client.objects.filter(owner=user)

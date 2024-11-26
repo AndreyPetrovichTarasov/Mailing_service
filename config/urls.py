@@ -11,6 +11,7 @@ urlpatterns = [
     path('clients/', include('clients.urls', namespace='clients')),
     path('mailings/', include('mailings.urls', namespace='mailings')),
     path('messages_list/', include('messages_list.urls', namespace='messages')),
+    path('users/', include('users.urls', namespace='users')),
 ]
 
 # Обработка медиафайлов в режиме DEBUG

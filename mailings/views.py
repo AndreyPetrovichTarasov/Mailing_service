@@ -1,4 +1,6 @@
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy, reverse
@@ -15,10 +17,42 @@ def send_mailing_view(request, pk):
     return redirect(reverse('mailings:mailing_status', args=[pk]))
 
 
-class MailingListView(ListView):
+class MailingListView(LoginRequiredMixin, ListView):
     model = Mailing
     template_name = 'mailings/mailings_list.html'
     context_object_name = 'mailings'
+
+    def get_queryset(self):
+        # Проверяем, принадлежит ли пользователь к группе "менеджеров"
+        if self.request.user.groups.filter(name='Managers').exists():
+            # Если принадлежит к группе "менеджеры", показываем все клиенты
+            return Mailing.objects.all()
+        else:
+            # Если не принадлежит, показываем только клиенты текущего пользователя
+            return Mailing.objects.filter(owner=self.request.user)
+
+
+class MailingStatusUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Mailing
+    fields = []  # Поля для изменения из формы
+    template_name = 'mailings/mailing_status_update.html'
+
+    def test_func(self):
+        # Только менеджеры имеют доступ
+        return self.request.user.groups.filter(name="Managers").exists()
+
+    def post(self, request, *args, **kwargs):
+        mailing = get_object_or_404(Mailing, pk=self.kwargs['pk'])
+        action = request.POST.get("action")
+
+        if action == "activate":
+            mailing.status = 'Запущена'
+            messages.success(request, f"Рассылка '{mailing}' успешно запущена.")
+        elif action == "deactivate":
+            mailing.status = 'Завершена'
+            messages.success(request, f"Рассылка '{mailing}' успешно завершена.")
+        mailing.save()
+        return redirect('mailings:mailing_list')
 
 
 class MailingDetailView(DetailView):
@@ -32,10 +66,21 @@ class MailingCreateView(CreateView):
     template_name = 'mailings/mailing_form.html'
     success_url = reverse_lazy('mailings:mailing_list')
 
+    def get_form_kwargs(self):
+        """Передаём пользователя в форму через kwargs."""
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user  # Добавляем текущего пользователя
+        return kwargs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['is_update'] = False  # Для создания клиента
+        context['is_update'] = False  # Для создания рассылки
         return context
+
+    def form_valid(self, form):
+        # Устанавливаем владельцем текущего пользователя
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
 
 
 class MailingUpdateView(UpdateView):
@@ -47,6 +92,16 @@ class MailingUpdateView(UpdateView):
         context = super().get_context_data(**kwargs)
         context['is_update'] = True  # Для редактирования клиента
         return context
+
+    def get_object(self):
+        mailing = get_object_or_404(Mailing, id=self.kwargs['pk'])
+        if not mailing.is_owned_by(self.request.user):
+            raise Http404("Вы не можете редактировать эту рассылку.")
+        return mailing
+
+    def test_func(self):
+        # Проверка, что пользователь имеет доступ
+        return self.get_object().is_owned_by(self.request.user)
 
     def get_success_url(self):
         """
@@ -92,3 +147,25 @@ class MailingStatusView(DetailView):
         # Получаем все попытки отправки для данной рассылки
         context['attempts'] = MailingAttempt.objects.filter(mailing=self.object)
         return context
+
+
+class AllMailingListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    model = Mailing
+    template_name = 'all_mailings.html'
+    context_object_name = 'mailings'
+
+    def test_func(self):
+        # Проверка, что пользователь является менеджером
+        return self.request.user.is_staff
+
+
+class DisableMailingView(LoginRequiredMixin, UserPassesTestMixin, View):
+    def test_func(self):
+        # Проверка, что пользователь является менеджером
+        return self.request.user.is_staff
+
+    def post(self, request, mailing_id):
+        mailing = get_object_or_404(Mailing, id=mailing_id)
+        mailing.status = 'Завершена'  # Закрываем рассылку
+        mailing.save()
+        return redirect('mailings:all_mailings')

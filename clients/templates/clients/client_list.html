@@ -5,13 +5,17 @@
     <div class="container">
         <h2 class="text-center mb-4">Список клиентов для рассылки</h2>
         <h3 class="text-center mb-4">Всего получателей: {{ clients|length }}</h3>
-        <div class="text-center mb-4"><a class="btn btn-primary btn-sm" href="{% url 'clients:client_create' %}" role="button">Добавить получателя</a>
+        <div class="text-center mb-4">
+            {% if not user|is_in_group:"Managers" %}
+            <a class="btn btn-primary btn-sm" href="{% url 'clients:client_create' %}" role="button">Добавить получателя</a>
+            {% endif %}
         </div>
         <table class="table table-striped">
             <thead>
                 <tr>
                     <th scope="col">Имя</th>
                     <th scope="col">Email</th>
+                    <th scope="col">Владелец</th>
                     <th scope="col">Комментарий</th>
                     <th scope="col">Действия</th>
                 </tr>
@@ -21,6 +25,7 @@
                 <tr>
                     <td>{{ client.full_name }}</td>
                     <td>{{ client.email }}</td>
+                    <td>{{ client.owner }}</td>
                     <td>{{ client.comment|truncatechars:100 }}</td>
                     <td>
                         <a class="btn btn-primary btn-sm" href="{% url 'clients:client_detail' client.id %}" role="button">Посмотреть</a>

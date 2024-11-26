@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import timezone
 from clients.models import Client
@@ -17,9 +18,26 @@ class Mailing(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Создана')
     message = models.ForeignKey(Message, on_delete=models.CASCADE)
     recipients = models.ManyToManyField(Client)
+    owner = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name="Рассылки",
+        verbose_name="Владелец"
+    )
 
     def __str__(self):
         return f'Рассылка {self.id} ({self.status})'
+
+    def is_owned_by(self, user):
+        """Проверяет, является ли пользователь владельцем рассылки."""
+        return self.owner == user
+
+    class Meta:
+        verbose_name = "рассылка"
+        verbose_name_plural = "рассылки"
+        permissions = [
+            ('can_disable_mailing', 'Can disable mailing')
+        ]
 
 
 class MailingAttempt(models.Model):
@@ -37,3 +55,7 @@ class MailingAttempt(models.Model):
 
     def __str__(self):
         return f'Попытка {self.id} для рассылки {self.mailing.id}'
+
+    class Meta:
+        verbose_name = "попытка рассылки"
+        verbose_name_plural = "попытки рассылок"

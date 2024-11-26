@@ -9,7 +9,7 @@ def send_mailing(mailing):
             send_mail(
                 mailing.message.subject,
                 mailing.message.body,
-                'lacry@rambler.ru',
+                'lacryk@yandex.ru',
                 [recipient.email],
             )
             status = 'Успешно'

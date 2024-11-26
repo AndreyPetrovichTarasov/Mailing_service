@@ -16,3 +16,8 @@ def media_filter(path):
 def add_class(field, css_class):
     return field.as_widget(attrs={"class": css_class})
 
+
+@register.filter
+def is_in_group(user, group_name):
+    """Проверяет, состоит ли пользователь в указанной группе."""
+    return user.groups.filter(name=group_name).exists()

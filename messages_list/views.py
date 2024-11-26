@@ -1,3 +1,5 @@
+from django.http import Http404
+from django.shortcuts import get_object_or_404
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy, reverse
 
@@ -11,7 +13,13 @@ class MessageListView(ListView):
     context_object_name = 'messages'
 
     def get_queryset(self):
-        return Message.objects.order_by('subject')
+        # Проверяем, принадлежит ли пользователь к группе "менеджеров"
+        if self.request.user.groups.filter(name='Managers').exists():
+            # Если принадлежит к группе "менеджеры", показываем все клиенты
+            return Message.objects.all().order_by('subject')
+        else:
+            # Если не принадлежит, показываем только клиенты текущего пользователя
+            return Message.objects.filter(owner=self.request.user).order_by('subject')
 
 
 class MessageDetailView(DetailView):
@@ -30,6 +38,10 @@ class MessageCreateView(CreateView):
         context['is_update'] = False  # Для создания клиента
         return context
 
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
+
 
 class MessageUpdateView(UpdateView):
     model = Message
@@ -40,6 +52,16 @@ class MessageUpdateView(UpdateView):
         context = super().get_context_data(**kwargs)
         context['is_update'] = True  # Для редактирования клиента
         return context
+
+    def get_object(self):
+        client = get_object_or_404(Message, id=self.kwargs['pk'])
+        if not client.is_owned_by(self.request.user):
+            raise Http404("Вы не можете редактировать этот клиент.")
+        return client
+
+    def test_func(self):
+        # Проверка, что пользователь имеет доступ
+        return self.get_object().is_owned_by(self.request.user)
 
     def get_success_url(self):
         """

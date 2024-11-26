@@ -6,15 +6,19 @@
         <div class="row d-flex justify-content-center">
             <div class="col-6">
                 <div class="card shadow-sm w-100">
-<!--                    <img src="{{ clients.preview_image | media_filter }}" class="img-fluid" style="height: 400px; object-fit: cover; width: 100%;">-->
+                    <!--                    <img src="{{ clients.preview_image | media_filter }}" class="img-fluid" style="height: 400px; object-fit: cover; width: 100%;">-->
                     <div class="card-body">
                         <h1 class="card-title text-center">{{ client.full_name }}</h1>
                         <p class="card-text">Почта: {{ client.email }}</p>
+                        <p class="card-text">Владелец: {{ client.owner }}</p>
                         <p class="card-text text-muted">Комментарий: {{ client.comment }}</p>
                         <div class="d-flex justify-content-between align-items-center">
-                            <a class="btn btn-primary" href="{% url 'clients:client_list' %}" role="button">Обратно к списку</a>
+                            <a class="btn btn-primary" href="{% url 'clients:client_list' %}" role="button">Обратно к
+                                списку</a>
+                            {% if user == mailing.owner %}
                             <a class="btn btn-primary" href="{% url 'clients:client_update' client.id %}" role="button">Редактировать</a>
                             <a class="btn btn-danger" href="{% url 'clients:client_delete' client.id %}" role="button">Удалить</a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
