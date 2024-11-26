@@ -10,7 +10,7 @@ class Message(models.Model):
         get_user_model(),
         on_delete=models.CASCADE,
         related_name="Сообщения",
-        verbose_name="Владелец"
+        verbose_name="Владелец",
     )
 
     def __str__(self):

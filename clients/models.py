@@ -11,11 +11,11 @@ class Client(models.Model):
         get_user_model(),
         on_delete=models.CASCADE,
         related_name="Клиенты",
-        verbose_name="Владелец"
+        verbose_name="Владелец",
     )
 
     def __str__(self):
-        return f'{self.full_name}: {self.email}'
+        return f"{self.full_name}: {self.email}"
 
     def is_owned_by(self, user):
         """Проверяет, является ли пользователь владельцем клиента."""

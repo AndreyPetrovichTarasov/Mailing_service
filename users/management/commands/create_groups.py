@@ -11,7 +11,7 @@ class Command(BaseCommand):
         """
         Получаем группу "moderators" или создаем её, если не существует
         """
-        Managers, created = Group.objects.get_or_create(name='Managers')
+        Managers, created = Group.objects.get_or_create(name="Managers")
 
         """
         Получаем разрешения для модели Product
@@ -34,7 +34,7 @@ class Command(BaseCommand):
         Пример добавления кастомного разрешения, если оно есть
         Например, разрешение на снятие товара с публикации
         """
-        custom_permission = Permission.objects.get(codename='can_disable_mailing')
+        custom_permission = Permission.objects.get(codename="can_disable_mailing")
         Managers.permissions.add(custom_permission)
 
         self.stdout.write(self.style.SUCCESS('Права успешно назначены группе "Managers"'))

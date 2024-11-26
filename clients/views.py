@@ -1,7 +1,13 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import Http404
 from django.shortcuts import get_object_or_404
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import (
+    ListView,
+    DetailView,
+    CreateView,
+    UpdateView,
+    DeleteView,
+)
 from django.urls import reverse_lazy, reverse
 from .models import Client
 from config.forms.forms import ClientForm
@@ -9,33 +15,33 @@ from config.forms.forms import ClientForm
 
 class ClientListView(LoginRequiredMixin, ListView):
     model = Client
-    template_name = 'clients/client_list.html'
-    context_object_name = 'clients'
+    template_name = "clients/client_list.html"
+    context_object_name = "clients"
 
     def get_queryset(self):
         # Проверяем, принадлежит ли пользователь к группе "менеджеров"
-        if self.request.user.groups.filter(name='Managers').exists():
+        if self.request.user.groups.filter(name="Managers").exists():
             # Если принадлежит к группе "менеджеры", показываем все клиенты
-            return Client.objects.all().order_by('full_name')
+            return Client.objects.all().order_by("full_name")
         else:
             # Если не принадлежит, показываем только клиенты текущего пользователя
-            return Client.objects.filter(owner=self.request.user).order_by('full_name')
+            return Client.objects.filter(owner=self.request.user).order_by("full_name")
 
 
 class ClientDetailView(DetailView):
     model = Client
-    template_name = 'clients/client_detail.html'
+    template_name = "clients/client_detail.html"
 
 
 class ClientCreateView(CreateView):
     model = Client
     form_class = ClientForm
-    template_name = 'clients/client_form.html'
-    success_url = reverse_lazy('clients:client_list')
+    template_name = "clients/client_form.html"
+    success_url = reverse_lazy("clients:client_list")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['is_update'] = False  # Для создания клиента
+        context["is_update"] = False  # Для создания клиента
         return context
 
     def form_valid(self, form):
@@ -47,21 +53,21 @@ class ClientCreateView(CreateView):
 class ClientUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Client
     form_class = ClientForm
-    template_name = 'clients/client_form.html'
+    template_name = "clients/client_form.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['is_update'] = True  # Для редактирования клиента
+        context["is_update"] = True  # Для редактирования клиента
         return context
 
     def get_success_url(self):
         """
         Переопределение метода редиректа после успешного изменения статьи
         """
-        return reverse('clients:client_detail', kwargs={'pk': self.object.pk})
+        return reverse("clients:client_detail", kwargs={"pk": self.object.pk})
 
     def get_object(self):
-        client = get_object_or_404(Client, id=self.kwargs['pk'])
+        client = get_object_or_404(Client, id=self.kwargs["pk"])
         if not client.is_owned_by(self.request.user):
             raise Http404("Вы не можете редактировать этот клиент.")
         return client
@@ -73,14 +79,14 @@ class ClientUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
 class ClientDeleteView(DeleteView):
     model = Client
-    template_name = 'clients/client_confirm_delete.html'
-    success_url = reverse_lazy('clients:client_list')
+    template_name = "clients/client_confirm_delete.html"
+    success_url = reverse_lazy("clients:client_list")
 
 
 class AllClientListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Client
-    template_name = 'all_clients.html'
-    context_object_name = 'clients'
+    template_name = "all_clients.html"
+    context_object_name = "clients"
 
     def test_func(self):
         # Проверка, что пользователь является менеджером

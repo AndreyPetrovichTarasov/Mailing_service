@@ -1,6 +1,5 @@
 from django.core.mail import send_mail
-from .models import Mailing, MailingAttempt
-from django.utils import timezone
+from .models import MailingAttempt
 
 
 def send_mailing(mailing):
@@ -9,19 +8,14 @@ def send_mailing(mailing):
             send_mail(
                 mailing.message.subject,
                 mailing.message.body,
-                'lacryk@yandex.ru',
+                "lacryk@yandex.ru",
                 [recipient.email],
             )
-            status = 'Успешно'
-            response = 'Message sent successfully.'
+            status = "Успешно"
+            response = "Message sent successfully."
         except Exception as e:
-            status = 'Не успешно'
+            status = "Не успешно"
             response = str(e)
 
         # Создаем запись попытки отправки
-        MailingAttempt.objects.create(
-            mailing=mailing,
-            recipient=recipient,
-            status=status,
-            response=response
-        )
+        MailingAttempt.objects.create(mailing=mailing, recipient=recipient, status=status, response=response)

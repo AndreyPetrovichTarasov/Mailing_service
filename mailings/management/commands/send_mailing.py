@@ -5,18 +5,18 @@ from mailings.services import send_mailing
 
 
 class Command(BaseCommand):
-    help = 'Send a mailing to all recipients.'
+    help = "Send a mailing to all recipients."
 
     def add_arguments(self, parser):
-        parser.add_argument('mailing_id', type=int)
+        parser.add_argument("mailing_id", type=int)
 
     def handle(self, *args, **kwargs):
-        mailing_id = kwargs['mailing_id']
+        mailing_id = kwargs["mailing_id"]
         try:
             mailing = Mailing.objects.get(id=mailing_id)
             send_mailing(mailing)
-            self.stdout.write(self.style.SUCCESS(f'Mailing {mailing_id} sent successfully.'))
+            self.stdout.write(self.style.SUCCESS(f"Mailing {mailing_id} sent successfully."))
         except ObjectDoesNotExist:
-            self.stdout.write(self.style.ERROR(f'Mailing with ID {mailing_id} does not exist.'))
+            self.stdout.write(self.style.ERROR(f"Mailing with ID {mailing_id} does not exist."))
         except Exception as e:
-            self.stdout.write(self.style.ERROR(f'An error occurred: {e}'))
+            self.stdout.write(self.style.ERROR(f"An error occurred: {e}"))
