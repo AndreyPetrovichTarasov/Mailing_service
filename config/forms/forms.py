@@ -50,7 +50,5 @@ class MailingForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         if user:
-            # Фильтруем сообщения по владельцу (текущему пользователю)
             self.fields['message'].queryset = Message.objects.filter(owner=user)
-            # Фильтруем клиентов по владельцу (текущему пользователю)
             self.fields['recipients'].queryset = Client.objects.filter(owner=user)

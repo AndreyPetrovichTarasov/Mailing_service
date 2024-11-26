@@ -93,6 +93,12 @@ class MailingUpdateView(UpdateView):
         context['is_update'] = True  # Для редактирования клиента
         return context
 
+    def get_form_kwargs(self):
+        """Передаём пользователя в форму через kwargs."""
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user  # Добавляем текущего пользователя
+        return kwargs
+
     def get_object(self):
         mailing = get_object_or_404(Mailing, id=self.kwargs['pk'])
         if not mailing.is_owned_by(self.request.user):
