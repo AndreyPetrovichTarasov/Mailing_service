@@ -52,7 +52,7 @@ class ContactsView(FormView):
         messages.success(
             self.request, f'Спасибо, {name}! Ваше сообщение "{message}" получено.'
         )  # Добавляем сообщение об успехе
-        return super().form_valid(form)  # Вызовем метод родителя для перенаправления на success_url
+        return super().form_valid(form)
 
     def form_invalid(self, form):
         """

@@ -3,6 +3,9 @@ from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
+    """
+    Кастомная команда для создания суперпользователя
+    """
     def handle(self, *args, **options):
         User = get_user_model()
         user = User.objects.create(

@@ -4,6 +4,9 @@ from .models import MailingAttempt
 
 
 def send_mailing(mailing):
+    """
+    Функция для отправки рассылок
+    """
     for recipient in mailing.recipients.all():
         try:
             send_mail(

@@ -4,13 +4,11 @@ from django.contrib.auth.views import (LogoutView, PasswordResetCompleteView,
                                        PasswordResetView)
 from django.urls import path, reverse_lazy
 
-from clients.views import AllClientListView, ClientListView, ClientUpdateView
-from mailings.views import (AllMailingListView, DisableMailingView,
-                            MailingListView, MailingUpdateView)
+from mailings.views import DisableMailingView
 
 from .views import (ActivateUserView, BlockUserView, CustomLoginView,
                     DeactivateUserView, ProfileEditView, ProfileView,
-                    RegisterView, UsersListView, email_verifixation)
+                    RegisterView, UsersListView, email_verification)
 
 app_name = "users"
 
@@ -22,7 +20,7 @@ urlpatterns = [
     path("profile/edit/", ProfileEditView.as_view(), name="edit_profile"),
     path(
         "confirm-registration/<str:token>/",
-        email_verifixation,
+        email_verification,
         name="confirm-registration",
     ),
     path(
@@ -55,14 +53,6 @@ urlpatterns = [
     path("users/", UsersListView.as_view(), name="users_list"),
     path("activate/<int:pk>/", ActivateUserView.as_view(), name="activate_user"),
     path("deactivate/<int:pk>/", DeactivateUserView.as_view(), name="deactivate_user"),
-    path("clients/", ClientListView.as_view(), name="client_list"),
-    path("client/edit/<int:pk>/", ClientUpdateView.as_view(), name="client_edit"),
-    path("clients/all/", AllClientListView.as_view(), name="all_clients"),
-    # Страницы для рассылок
-    path("mailings/", MailingListView.as_view(), name="mailing_list"),
-    path("mailing/edit/<int:pk>/", MailingUpdateView.as_view(), name="mailing_edit"),
-    path("mailings/all/", AllMailingListView.as_view(), name="all_mailings"),
-    # Для блокировки пользователя и отключения рассылки
     path("block_user/<int:user_id>/", BlockUserView.as_view(), name="block_user"),
     path(
         "disable_mailing/<int:mailing_id>/",

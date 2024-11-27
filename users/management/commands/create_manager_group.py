@@ -3,6 +3,9 @@ from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
+    """
+    Кастомная команда для создания группы
+    """
     help = 'Создает группу "Менеджеры" в базе данных'
 
     def handle(self, *args, **kwargs):

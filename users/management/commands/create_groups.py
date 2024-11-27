@@ -6,21 +6,21 @@ from mailings.models import Mailing
 
 
 class Command(BaseCommand):
-    help = 'Назначает разрешения для группы "moderators"'
+    help = 'Назначает разрешения для группы "Managers"'
 
     def handle(self, *args, **kwargs):
         """
-        Получаем группу "moderators" или создаем её, если не существует
+        Получаем группу "Managers" или создаем её, если не существует
         """
         Managers, created = Group.objects.get_or_create(name="Managers")
 
         """
-        Получаем разрешения для модели Product
+        Получаем разрешения для модели Mailing
         """
         content_type = ContentType.objects.get_for_model(Mailing)
 
         """
-        Стандартные разрешения для модели Product
+        Стандартные разрешения для модели Mailing
         """
         permissions = Permission.objects.filter(content_type=content_type)
 
@@ -32,8 +32,6 @@ class Command(BaseCommand):
 
         """
         Добавляем кастомные разрешения
-        Пример добавления кастомного разрешения, если оно есть
-        Например, разрешение на снятие товара с публикации
         """
         custom_permission = Permission.objects.get(codename="can_disable_mailing")
         Managers.permissions.add(custom_permission)

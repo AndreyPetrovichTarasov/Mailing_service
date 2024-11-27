@@ -17,7 +17,9 @@ class MailingAdmin(admin.ModelAdmin):
     search_fields = ("start_time", "status")
 
     def show_recipients(self, obj):
-        # Вывести имена первых получателей, например
+        """
+        Выводит имена первых получателей
+        """
         return ", ".join([str(recipient) for recipient in obj.recipients.all()[:3]])
 
     show_recipients.short_description = "Recipients"  # Название колонки в админке

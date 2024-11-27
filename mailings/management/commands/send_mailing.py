@@ -6,6 +6,9 @@ from mailings.services import send_mailing
 
 
 class Command(BaseCommand):
+    """
+    Кастомная команда для запуска рассылки
+    """
     help = "Send a mailing to all recipients."
 
     def add_arguments(self, parser):

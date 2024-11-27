@@ -1,5 +1,4 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.core.cache import cache
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
@@ -13,8 +12,10 @@ from config.forms.forms import ClientForm
 from .models import Client
 
 
-@method_decorator(cache_page(60 * 15), name='dispatch')
 class ClientListView(LoginRequiredMixin, ListView):
+    """
+    Представление списка всех клиентов
+    """
     model = Client
     template_name = "clients/client_list.html"
     context_object_name = "clients"
@@ -31,11 +32,17 @@ class ClientListView(LoginRequiredMixin, ListView):
 
 @method_decorator(cache_page(60 * 15), name='dispatch')
 class ClientDetailView(DetailView):
+    """
+    Представление детальной информации клиента
+    """
     model = Client
     template_name = "clients/client_detail.html"
 
 
 class ClientCreateView(CreateView):
+    """
+    Представление для создания клиента
+    """
     model = Client
     form_class = ClientForm
     template_name = "clients/client_form.html"
@@ -53,6 +60,9 @@ class ClientCreateView(CreateView):
 
 
 class ClientUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    """
+    Представление для редактирования клиентф
+    """
     model = Client
     form_class = ClientForm
     template_name = "clients/client_form.html"
@@ -80,23 +90,26 @@ class ClientUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
 
 class ClientDeleteView(DeleteView):
+    """
+    Представление для удаления клиента
+    """
     model = Client
     template_name = "clients/client_confirm_delete.html"
     success_url = reverse_lazy("clients:client_list")
 
 
-class AllClientListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
-    model = Client
-    template_name = "all_clients.html"
-    context_object_name = "clients"
-
-    def get_queryset(self):
-        queryset = cache.get('all_clients')
-        if not queryset:
-            queryset = super().get_queryset()
-            cache.set('all_clients', queryset, 60 * 15)
-        return queryset
-
-    def test_func(self):
-        # Проверка, что пользователь является менеджером
-        return self.request.user.is_staff
+# class AllClientListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+#     model = Client
+#     template_name = "all_clients.html"
+#     context_object_name = "clients"
+#
+#     def get_queryset(self):
+#         queryset = cache.get('all_clients')
+#         if not queryset:
+#             queryset = super().get_queryset()
+#             cache.set('all_clients', queryset, 60 * 15)
+#         return queryset
+#
+#     def test_func(self):
+#         # Проверка, что пользователь является менеджером
+#         return self.request.user.is_staff

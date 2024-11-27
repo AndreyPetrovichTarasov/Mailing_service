@@ -5,6 +5,9 @@ from .models import CustomUser
 
 
 class CustomUserCreationForm(UserCreationForm):
+    """
+    Форма создания пользователя
+    """
     phone_number = forms.CharField(max_length=15, required=False, help_text="Help")
     usable_password = None
 
@@ -29,6 +32,9 @@ class CustomUserCreationForm(UserCreationForm):
 
 
 class UserProfileForm(forms.ModelForm):
+    """
+    Форма профиля пользователя
+    """
     class Meta:
         model = CustomUser
         fields = [

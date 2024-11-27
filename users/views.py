@@ -2,13 +2,11 @@ import secrets
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.contrib.auth.views import LoginView, PasswordResetView
+from django.contrib.auth.views import LoginView
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
-from django.utils.decorators import method_decorator
 from django.views import View
-from django.views.decorators.cache import cache_page
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, UpdateView
 
@@ -19,6 +17,9 @@ from .models import CustomUser
 
 
 class RegisterView(CreateView):
+    """
+    Представление регистрации пользователя
+    """
     template_name = "users/register.html"
     form_class = CustomUserCreationForm
     success_url = reverse_lazy("home")
@@ -37,10 +38,15 @@ class RegisterView(CreateView):
             from_email=EMAIL_HOST_USER,
             recipient_list=[user.email],
         )
+
+        messages.success(
+            self.request,
+            "Вы успешно зарегистрировались! Проверьте вашу почту для подтверждения регистрации."
+        )
         return super().form_valid(form)
 
 
-def email_verifixation(request, token):
+def email_verification(request, token):
     user = get_object_or_404(CustomUser, token=token)
     user.is_active = True
     user.save()
@@ -48,32 +54,39 @@ def email_verifixation(request, token):
 
 
 class CustomLoginView(LoginView):
+    """
+    Представление для входа
+    """
     template_name = "users/login.html"
     success_url = reverse_lazy("catalog:home")
 
 
 class ProfileView(LoginRequiredMixin, DetailView):
+    """
+    Представление для просмотра профайла
+    """
     model = CustomUser
     form_class = UserProfileForm
     template_name = "users/profile.html"
 
 
 class ProfileEditView(LoginRequiredMixin, UpdateView):
+    """
+    Представление для редактирования профайла
+    """
     model = CustomUser
     form_class = UserProfileForm
     template_name = "users/edit_profile.html"
-    success_url = reverse_lazy("home")  # Перенаправление после успешного сохранения
+    success_url = reverse_lazy("home")
 
     def get_object(self, queryset=None):
         return self.request.user
 
 
-class MyPasswordResetView(PasswordResetView):
-    template_name = "users/password_reset_form.html"
-    success_url = "users:password_reset_done"
-
-
 class BlockUserView(LoginRequiredMixin, UserPassesTestMixin, View):
+    """
+    Представление для блокировки пользователей
+    """
     def test_func(self):
         # Проверка, что пользователь является менеджером
         return self.request.user.is_staff
@@ -85,16 +98,20 @@ class BlockUserView(LoginRequiredMixin, UserPassesTestMixin, View):
         return redirect("users:user_list")
 
 
-@method_decorator(cache_page(60 * 15), name='dispatch')
 class UsersListView(ListView):
+    """
+    Представление списка пользователй
+    """
     model = CustomUser
     template_name = "users/users_list.html"
     context_object_name = "users"
 
 
 class ActivateUserView(UserPassesTestMixin, View):
+    """
+    Представление для активации пользователя
+    """
     def test_func(self):
-        # Проверяем, является ли пользователь менеджером
         return self.request.user.groups.filter(name="Managers").exists()
 
     def post(self, request, pk):
@@ -102,13 +119,14 @@ class ActivateUserView(UserPassesTestMixin, View):
         user.is_active = True
         user.save()
         messages.success(request, f"Пользователь {user.username} был активирован.")
-        return redirect("users:users_list")  # Измените на ваш URL списка пользователей
+        return redirect("users:users_list")
 
 
-# Представление для деактивации пользователя
 class DeactivateUserView(UserPassesTestMixin, View):
+    """
+    Представление для деактивации пользователя
+    """
     def test_func(self):
-        # Проверяем, является ли пользователь менеджером
         return self.request.user.groups.filter(name="Managers").exists()
 
     def post(self, request, pk):
