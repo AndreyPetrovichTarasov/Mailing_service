@@ -1,9 +1,10 @@
-from django.views.generic import TemplateView, FormView
-from config.forms.forms import ContactForm
-from mailings.models import Mailing, Client
 from django.contrib import messages
 from django.core.mail import EmailMessage
 from django.urls import reverse_lazy
+from django.views.generic import FormView, TemplateView
+
+from config.forms.forms import ContactForm
+from mailings.models import Client, Mailing
 
 
 class HomePageView(TemplateView):

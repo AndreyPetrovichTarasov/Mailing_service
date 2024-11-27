@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+
 from clients.models import Client
 from messages_list.models import Message
 

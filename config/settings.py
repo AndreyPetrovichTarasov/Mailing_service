@@ -1,8 +1,8 @@
 import os
+from pathlib import Path
 
 from django.urls import reverse_lazy
 from dotenv import load_dotenv
-from pathlib import Path
 
 load_dotenv(override=True)
 

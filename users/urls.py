@@ -1,29 +1,16 @@
+from django.contrib.auth.views import (LogoutView, PasswordResetCompleteView,
+                                       PasswordResetConfirmView,
+                                       PasswordResetDoneView,
+                                       PasswordResetView)
 from django.urls import path, reverse_lazy
-from clients.views import ClientListView, AllClientListView, ClientUpdateView
-from mailings.views import (
-    MailingListView,
-    MailingUpdateView,
-    AllMailingListView,
-    DisableMailingView,
-)
-from .views import (
-    RegisterView,
-    CustomLoginView,
-    ProfileEditView,
-    email_verifixation,
-    ProfileView,
-    BlockUserView,
-    UsersListView,
-    ActivateUserView,
-    DeactivateUserView,
-)
-from django.contrib.auth.views import (
-    LogoutView,
-    PasswordResetView,
-    PasswordResetDoneView,
-    PasswordResetConfirmView,
-    PasswordResetCompleteView,
-)
+
+from clients.views import AllClientListView, ClientListView, ClientUpdateView
+from mailings.views import (AllMailingListView, DisableMailingView,
+                            MailingListView, MailingUpdateView)
+
+from .views import (ActivateUserView, BlockUserView, CustomLoginView,
+                    DeactivateUserView, ProfileEditView, ProfileView,
+                    RegisterView, UsersListView, email_verifixation)
 
 app_name = "users"
 
