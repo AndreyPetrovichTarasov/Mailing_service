@@ -11,8 +11,12 @@ from django.views.generic import (
 from django.urls import reverse_lazy, reverse
 from .models import Client
 from config.forms.forms import ClientForm
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
+from django.core.cache import cache
 
 
+@method_decorator(cache_page(60 * 15), name='dispatch')
 class ClientListView(LoginRequiredMixin, ListView):
     model = Client
     template_name = "clients/client_list.html"
@@ -28,6 +32,7 @@ class ClientListView(LoginRequiredMixin, ListView):
             return Client.objects.filter(owner=self.request.user).order_by("full_name")
 
 
+@method_decorator(cache_page(60 * 15), name='dispatch')
 class ClientDetailView(DetailView):
     model = Client
     template_name = "clients/client_detail.html"
@@ -87,6 +92,13 @@ class AllClientListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Client
     template_name = "all_clients.html"
     context_object_name = "clients"
+
+    def get_queryset(self):
+        queryset = cache.get('all_clients')
+        if not queryset:
+            queryset = super().get_queryset()
+            cache.set('all_clients', queryset, 60 * 15)
+        return queryset
 
     def test_func(self):
         # Проверка, что пользователь является менеджером

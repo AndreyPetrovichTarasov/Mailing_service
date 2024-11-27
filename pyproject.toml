@@ -12,9 +12,7 @@ python-dotenv = "^1.0.1"
 psycopg2 = "^2.9.10"
 pillow = "^11.0.0"
 ipython = "^8.29.0"
-django-phonenumber-field = "^8.0.0"
-phonenumbers = "^8.13.50"
-django-extensions = "^3.2.3"
+redis = "^5.2.0"
 
 
 [tool.poetry.group.lint.dependencies]

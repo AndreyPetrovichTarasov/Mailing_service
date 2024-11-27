@@ -1,6 +1,8 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from django.views.generic import (
     ListView,
     DetailView,
@@ -14,6 +16,7 @@ from config.forms.forms import MessageForm
 from .models import Message
 
 
+@method_decorator(cache_page(60 * 15), name='dispatch')
 class MessageListView(LoginRequiredMixin, ListView):
     model = Message
     template_name = "messages_list/message_list.html"
@@ -29,6 +32,7 @@ class MessageListView(LoginRequiredMixin, ListView):
             return Message.objects.filter(owner=self.request.user).order_by("subject")
 
 
+@method_decorator(cache_page(60 * 15), name='dispatch')
 class MessageDetailView(DetailView):
     model = Message
     template_name = "messages_list/message_detail.html"

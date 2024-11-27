@@ -6,7 +6,9 @@ from django.contrib.auth.views import LoginView, PasswordResetView
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
+from django.utils.decorators import method_decorator
 from django.views import View
+from django.views.decorators.cache import cache_page
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, UpdateView
 from .forms import CustomUserCreationForm, UserProfileForm
@@ -81,6 +83,7 @@ class BlockUserView(LoginRequiredMixin, UserPassesTestMixin, View):
         return redirect("users:user_list")
 
 
+@method_decorator(cache_page(60 * 15), name='dispatch')
 class UsersListView(ListView):
     model = CustomUser
     template_name = "users/users_list.html"
