@@ -10,6 +10,7 @@ from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
                                   UpdateView)
 
 from config.forms.forms import MailingForm
+from .mixins import OwnerOrManagerMixin, OwnerMixin
 
 from .models import Mailing, MailingAttempt
 from .services import send_mailing
@@ -67,12 +68,19 @@ class MailingStatusUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateVie
 
 
 @method_decorator(cache_page(60 * 15), name='dispatch')
-class MailingDetailView(DetailView):
+class MailingDetailView(LoginRequiredMixin, OwnerOrManagerMixin, DetailView):
     """
     Представление просмотра рассылки
     """
     model = Mailing
     template_name = "mailings/mailings_detail.html"
+
+    def test_func(self):
+        mailing = get_object_or_404(Mailing, id=self.kwargs["pk"])
+        return mailing.owner == self.request.user or self.request.user.groups.filter(name="Managers").exists()
+
+    def handle_no_permission(self):
+        raise Http404("У вас нет доступа к этой рассылке.")
 
 
 class MailingCreateView(CreateView):
@@ -101,7 +109,7 @@ class MailingCreateView(CreateView):
         return super().form_valid(form)
 
 
-class MailingUpdateView(UpdateView):
+class MailingUpdateView(LoginRequiredMixin, OwnerMixin, UpdateView):
     """
     Представление для изменения рассылки
     """
@@ -120,15 +128,12 @@ class MailingUpdateView(UpdateView):
         kwargs["user"] = self.request.user  # Добавляем текущего пользователя
         return kwargs
 
-    def get_object(self):
-        mailing = get_object_or_404(Mailing, id=self.kwargs["pk"])
-        if not mailing.is_owned_by(self.request.user):
-            raise Http404("Вы не можете редактировать эту рассылку.")
-        return mailing
-
     def test_func(self):
-        # Проверка, что пользователь имеет доступ
-        return self.get_object().is_owned_by(self.request.user)
+        mailing = get_object_or_404(Mailing, id=self.kwargs["pk"])
+        return mailing.owner == self.request.user
+
+    def handle_no_permission(self):
+        raise Http404("У вас нет доступа к этой рассылке.")
 
     def get_success_url(self):
         """
@@ -145,13 +150,20 @@ class MailingConfirmSendView(DetailView):
     template_name = "mailings/mailing_confirm_send.html"
 
 
-class MailingDeleteView(DeleteView):
+class MailingDeleteView(LoginRequiredMixin, OwnerMixin, DeleteView):
     """
     Представление для удаления рассылки
     """
     model = Mailing
     template_name = "mailings/mailings_confirm_delete.html"
     success_url = reverse_lazy("mailings_list")
+
+    def test_func(self):
+        mailing = get_object_or_404(Mailing, id=self.kwargs["pk"])
+        return mailing.owner == self.request.user
+
+    def handle_no_permission(self):
+        raise Http404("У вас нет доступа к этой рассылке.")
 
 
 class MailingSendView(View):
